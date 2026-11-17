@@ -1,4 +1,12 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createSeedTasks, DEFAULT_PROJECTS } from '../data/seedData';
 import {
   PriorityFilter,
@@ -90,7 +98,7 @@ interface TaskContextValue {
   // Backup & reset
   exportJson: () => void;
   importJson: (rawJson: string) => { ok: boolean; error?: string };
-  resetToSampleData: () => void;
+  resetWorkspace: () => void;
   clearAllTasks: () => void;
   resetAllFilters: () => void;
   // Computed counts
@@ -140,6 +148,107 @@ function loadInitialWorkspace(): PersistedWorkspace {
   };
 }
 
+const TASK_STATUSES: TaskStatus[] = ['todo', 'in_progress', 'done'];
+const TASK_PRIORITIES: TaskPriority[] = ['low', 'medium', 'high'];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizeIsoDate(value: unknown): string | null {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null;
+}
+
+function normalizeSubtask(value: unknown): Subtask | null {
+  if (typeof value === 'string') {
+    const title = value.trim();
+    return title ? { id: generateId('sub'), title, completed: false } : null;
+  }
+  if (!isRecord(value)) return null;
+
+  const title = typeof value.title === 'string' ? value.title.trim() : '';
+  if (!title) return null;
+
+  return {
+    id: typeof value.id === 'string' && value.id ? value.id : generateId('sub'),
+    title,
+    completed: value.completed === true,
+  };
+}
+
+function normalizeProject(value: unknown): Project | null {
+  if (!isRecord(value)) return null;
+
+  const name = typeof value.name === 'string' ? value.name.trim() : '';
+  if (!name) return null;
+
+  const color =
+    typeof value.color === 'string' && /^#(?:[\da-f]{3}|[\da-f]{6})$/i.test(value.color)
+      ? value.color
+      : '#3B82F6';
+
+  return {
+    id: typeof value.id === 'string' && value.id ? value.id : generateId('proj'),
+    name,
+    color,
+  };
+}
+
+function normalizeTask(value: unknown, now: string, fallbackProjectId: string): Task | null {
+  if (!isRecord(value)) return null;
+
+  const title = typeof value.title === 'string' ? value.title.trim() : '';
+  if (!title) return null;
+
+  const rawStatus = value.status;
+  const status: TaskStatus = TASK_STATUSES.includes(rawStatus as TaskStatus)
+    ? (rawStatus as TaskStatus)
+    : 'todo';
+
+  const rawPriority = value.priority;
+  const priority: TaskPriority = TASK_PRIORITIES.includes(rawPriority as TaskPriority)
+    ? (rawPriority as TaskPriority)
+    : 'medium';
+
+  const subtasks = Array.isArray(value.subtasks)
+    ? value.subtasks.map(normalizeSubtask).filter((s): s is Subtask => s !== null)
+    : [];
+
+  const createdAt = typeof value.createdAt === 'string' && value.createdAt ? value.createdAt : now;
+  const updatedAt = typeof value.updatedAt === 'string' && value.updatedAt ? value.updatedAt : now;
+  const rawProgress = value.manualProgress;
+
+  return {
+    id: typeof value.id === 'string' && value.id ? value.id : generateId('task'),
+    title,
+    description: typeof value.description === 'string' ? value.description.trim() : '',
+    status,
+    priority,
+    projectId:
+      typeof value.projectId === 'string' && value.projectId
+        ? value.projectId
+        : fallbackProjectId,
+    dueDate: normalizeIsoDate(value.dueDate),
+    manualProgress:
+      typeof rawProgress === 'number' && Number.isFinite(rawProgress)
+        ? Math.max(0, Math.min(100, Math.round(rawProgress)))
+        : status === 'done'
+        ? 100
+        : status === 'in_progress'
+        ? 50
+        : 0,
+    subtasks,
+    createdAt,
+    updatedAt,
+    completedAt:
+      status === 'done'
+        ? typeof value.completedAt === 'string' && value.completedAt
+          ? value.completedAt
+          : updatedAt
+        : null,
+  };
+}
+
 export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [initial] = useState<PersistedWorkspace>(() => loadInitialWorkspace());
   const [tasks, setTasks] = useState<Task[]>(initial.tasks);
@@ -156,21 +265,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [createModalDefaultStatus, setCreateModalDefaultStatus] = useState<TaskStatus>('todo');
   const [toast, setToast] = useState<ToastState | null>(null);
-
-  // Sync to localStorage
-  useEffect(() => {
-    try {
-      const payload: PersistedWorkspace = {
-        version: 1,
-        tasks,
-        projects,
-        viewMode,
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    } catch {
-      // Ignore storage quota errors silently
-    }
-  }, [tasks, projects, viewMode]);
+  const storageErrorShownRef = useRef(false);
 
   // Auto-dismiss toast after 4.5s
   useEffect(() => {
@@ -184,6 +279,28 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
   const showToast = useCallback((next: Omit<ToastState, 'id'>) => {
     setToast({ ...next, id: generateId('toast') });
   }, []);
+
+  // Sync to localStorage. Surface failures instead of silently losing data.
+  useEffect(() => {
+    try {
+      const payload: PersistedWorkspace = {
+        version: 1,
+        tasks,
+        projects,
+        viewMode,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      storageErrorShownRef.current = false;
+    } catch {
+      if (!storageErrorShownRef.current) {
+        storageErrorShownRef.current = true;
+        showToast({
+          message: 'Không thể lưu vào trình duyệt. Hãy xuất JSON để sao lưu dữ liệu.',
+          tone: 'error',
+        });
+      }
+    }
+  }, [tasks, projects, viewMode, showToast]);
 
   const dismissToast = useCallback(() => {
     setToast(null);
@@ -480,38 +597,66 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
 
   const importJson = useCallback(
     (rawJson: string): { ok: boolean; error?: string } => {
+      let parsed: unknown;
       try {
-        const parsed = JSON.parse(rawJson) as Partial<PersistedWorkspace>;
-        if (!parsed || !Array.isArray(parsed.tasks)) {
-          return { ok: false, error: 'Tệp JSON không đúng định dạng danh sách công việc.' };
-        }
-        const validTasks: Task[] = parsed.tasks.filter(
-          (item): item is Task =>
-            Boolean(item && typeof item.id === 'string' && typeof item.title === 'string')
-        );
-        const validProjects: Project[] =
-          Array.isArray(parsed.projects) && parsed.projects.length > 0
-            ? parsed.projects.filter(
-                (p): p is Project => Boolean(p && typeof p.id === 'string' && typeof p.name === 'string')
-              )
-            : projects;
-
-        setTasks(validTasks);
-        if (validProjects.length > 0) setProjects(validProjects);
-        setActiveTaskId(null);
-        showToast({
-          message: `Đã khôi phục ${validTasks.length} công việc từ tệp JSON`,
-          tone: 'success',
-        });
-        return { ok: true };
+        parsed = JSON.parse(rawJson);
       } catch {
         return { ok: false, error: 'Không thể đọc tệp JSON. Vui lòng kiểm tra lại cấu trúc tệp.' };
       }
+
+      if (!isRecord(parsed) || !Array.isArray(parsed.tasks)) {
+        return { ok: false, error: 'Tệp JSON không có danh sách công việc hợp lệ.' };
+      }
+
+      const now = new Date().toISOString();
+      const importedProjects = Array.isArray(parsed.projects)
+        ? parsed.projects
+            .map(normalizeProject)
+            .filter((p): p is Project => p !== null)
+            .filter((p, index, all) => all.findIndex((item) => item.id === p.id) === index)
+        : [];
+      const nextProjects = importedProjects.length > 0 ? importedProjects : projects;
+      const fallbackProjectId = nextProjects[0]?.id ?? 'proj_product';
+
+      const importedTasks = parsed.tasks
+        .map((item) => normalizeTask(item, now, fallbackProjectId))
+        .filter((task): task is Task => task !== null)
+        .filter(
+          (task, index, all) => all.findIndex((item) => item.id === task.id) === index
+        );
+
+      if (parsed.tasks.length > 0 && importedTasks.length === 0) {
+        return { ok: false, error: 'Không tìm thấy công việc hợp lệ nào trong tệp JSON.' };
+      }
+
+      const projectIds = new Set(nextProjects.map((p) => p.id));
+      const nextTasks = importedTasks.map((task) =>
+        projectIds.has(task.projectId) ? task : { ...task, projectId: fallbackProjectId }
+      );
+
+      setTasks(nextTasks);
+      setProjects(nextProjects);
+      setSelectedProjectId('all');
+      setSmartFilter('all');
+      setPriorityFilter('all');
+      setSearchQuery('');
+      setViewMode(parsed.viewMode === 'kanban' ? 'kanban' : 'list');
+      setActiveTaskId(null);
+
+      const dropped = parsed.tasks.length - nextTasks.length;
+      showToast({
+        message:
+          dropped > 0
+            ? `Đã nhập ${nextTasks.length} công việc, bỏ qua ${dropped} mục không hợp lệ hoặc trùng lặp`
+            : `Đã nhập ${nextTasks.length} công việc từ tệp JSON`,
+        tone: 'success',
+      });
+      return { ok: true };
     },
     [projects, showToast]
   );
 
-  const resetToSampleData = useCallback(() => {
+  const resetWorkspace = useCallback(() => {
     setProjects(DEFAULT_PROJECTS);
     setTasks(createSeedTasks());
     setSelectedProjectId('all');
@@ -519,7 +664,10 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     setPriorityFilter('all');
     setSearchQuery('');
     setActiveTaskId(null);
-    showToast({ message: 'Đã khôi phục dữ liệu mẫu ban đầu', tone: 'info' });
+    showToast({
+      message: 'Đã đặt lại workspace — chưa có công việc, vẫn giữ 4 nhóm mặc định.',
+      tone: 'info',
+    });
   }, [showToast]);
 
   const clearAllTasks = useCallback(() => {
@@ -695,7 +843,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     deleteProject,
     exportJson,
     importJson,
-    resetToSampleData,
+    resetWorkspace,
     clearAllTasks,
     resetAllFilters,
     counts,

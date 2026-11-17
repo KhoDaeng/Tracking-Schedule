@@ -42,7 +42,7 @@ export function Sidebar({ mobileOpen, onCloseMobile }: SidebarProps) {
     deleteProject,
     exportJson,
     importJson,
-    resetToSampleData,
+    resetWorkspace,
     clearAllTasks,
     showToast,
   } = useTasks();
@@ -359,11 +359,12 @@ export function Sidebar({ mobileOpen, onCloseMobile }: SidebarProps) {
         <div className="flex items-center justify-between pt-1 gap-1">
           <button
             type="button"
-            onClick={resetToSampleData}
+            onClick={resetWorkspace}
+            title="Đặt lại về workspace trống, vẫn giữ 4 nhóm mặc định"
             className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-slate-400 hover:text-slate-200 rounded transition-colors whitespace-nowrap"
           >
             <RotateCcw className="w-3 h-3 shrink-0" />
-            <span>Dữ liệu mẫu</span>
+            <span>Đặt lại</span>
           </button>
 
           {!confirmClearAll ? (

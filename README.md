@@ -21,9 +21,9 @@ Dữ liệu tự động lưu trên trình duyệt của bạn (localStorage, ke
 
 ### Sao lưu / chuyển dữ liệu
 
-Trên thanh bên: **Xuất JSON** → tải file backup `tracking-schedule-backup-YYYY-MM-DD.json`; **Nhập JSON** → khôi phục trên máy khác.
+Trên thanh bên: **Xuất JSON** → tải file backup `tracking-schedule-backup-YYYY-MM-DD.json`; **Nhập JSON** → khôi phục trên máy khác. Khi nhập, các trường bị thiếu sẽ được điền giá trị an toàn, mục trùng lặp/không hợp lệ sẽ được bỏ qua và ứng dụng sẽ báo số lượng đã nhập.
 
-Nếu xóa site data của trình duyệt, dữ liệu cũng bị xóa.
+Nếu xóa site data của trình duyệt, dữ liệu cũng bị xóa. Nếu trình duyệt từ chối lưu (hết dung lượng, chế độ riêng tư…), góc phải sẽ hiện thông báo lỗi — lúc đó hãy bấm **Xuất JSON** ngay để sao lưu.
 
 ## Phát triển từ mã nguồn
 
