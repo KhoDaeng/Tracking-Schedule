@@ -470,7 +470,7 @@ export function TaskProvider({ children }: { children: React.ReactNode }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `tiendo-studio-backup-${getTodayIsoDate()}.json`;
+    a.download = `tracking-schedule-backup-${getTodayIsoDate()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

@@ -135,7 +135,7 @@ export function Sidebar({ mobileOpen, onCloseMobile }: SidebarProps) {
       {/* Brand Zone */}
       <div className="flex items-center justify-between h-14 px-5 border-b border-white/[0.08] shrink-0">
         <span className="font-display text-base font-bold tracking-tight text-slate-100 whitespace-nowrap">
-          Tiến Độ Studio
+          Tracking Schedule
         </span>
         <button
           type="button"

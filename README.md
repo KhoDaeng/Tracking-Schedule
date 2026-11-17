@@ -1,18 +1,23 @@
-# Tiến Độ Studio
+# Tracking Schedule
 
 Ứng dụng quản lý công việc giao diện nền tối: xem theo **Danh sách** hoặc **Bảng Kanban**, tự động tính phần trăm hoàn thành từ việc con, lọc/tìm kiếm/sắp xếp, và lưu dữ liệu ngay trên trình duyệt.
 
+**Repo:** https://github.com/KhoDaeng/Tracking-Schedule  
+**Tải bản mới nhất:** https://github.com/KhoDaeng/Tracking-Schedule/releases/latest
+
 ## Dùng ngay — không cần cài đặt
 
-1. Tải **`release/Tiendo-Studio.html`** (hoặc `release/Tiendo-Studio.zip` rồi giải nén).
+1. Tải **`release/Tracking-Schedule.html`** (hoặc `release/Tracking-Schedule.zip` rồi giải nén).
 2. Bấm đúp file `.html` để mở bằng Chrome / Edge / Opera.
 3. Dùng luôn — **không cần Node.js, không cần server, không cần đăng nhập, dùng được offline**.
 
 Dữ liệu tự động lưu trên trình duyệt của bạn (localStorage) sau mỗi thao tác. Đóng tab hay khởi động lại máy không mất dữ liệu.
 
+> Bản phát hành `v1.0.0` vẫn giữ tên file cũ `Tiendo-Studio.*` và link tải cũ vẫn hoạt động nhờ GitHub redirect. Các bản build mới sẽ dùng tên `Tracking-Schedule.*`.
+
 ### Sao lưu / chuyển dữ liệu
 
-Trên thanh bên: **Xuất JSON** → tải file backup; **Nhập JSON** → khôi phục trên máy khác.
+Trên thanh bên: **Xuất JSON** → tải file backup `tracking-schedule-backup-YYYY-MM-DD.json`; **Nhập JSON** → khôi phục trên máy khác.
 
 > Lưu ý: bản file HTML (`file://`) và bản chạy `http://localhost:3000` là **hai kho dữ liệu riêng**. Dùng Xuất/Nhập JSON để chuyển giữa chúng. Nếu xóa site data của trình duyệt, dữ liệu cũng bị xóa.
 
@@ -29,7 +34,7 @@ npm run dev        # http://localhost:3000
 | --- | --- |
 | `npm run dev` | Chạy server phát triển, có hot-reload |
 | `npm run build` | Build bản production vào `dist/` |
-| `npm run build:single` | Build rồi gộp toàn bộ JS/CSS thành `release/Tiendo-Studio.html` |
+| `npm run build:single` | Build rồi gộp toàn bộ JS/CSS thành `release/Tracking-Schedule.html` |
 | `npm run preview` | Xem thử bản đã build |
 | `npm run lint` | Kiểm tra TypeScript |
 
@@ -57,9 +62,9 @@ src/
 scripts/
   build-single-file.mjs Tạo bản đóng gói một file
 release/
-  Tiendo-Studio.html    Bản dùng ngay (kết quả build)
-  Tiendo-Studio.zip     Bản nén để gửi qua email
-implementation_plan.md  Bản thiết kế gốc
+  Tracking-Schedule.html  Bản dùng ngay (kết quả build)
+  Tracking-Schedule.zip   Bản nén để gửi qua email
+implementation_plan.md  Bản thiết kế gốc (tên cũ: Tiến Độ Studio)
 ```
 
 Công nghệ: React 19, TypeScript, Vite 8, Tailwind CSS 4, lucide-react.

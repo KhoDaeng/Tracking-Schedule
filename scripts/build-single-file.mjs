@@ -5,7 +5,7 @@ const root = path.resolve(import.meta.dirname, '..');
 const distDir = path.join(root, 'dist');
 const distHtml = path.join(distDir, 'index.html');
 const releaseDir = path.join(root, 'release');
-const output = path.join(releaseDir, 'Tiendo-Studio.html');
+const output = path.join(releaseDir, 'Tracking-Schedule.html');
 
 let html = fs.readFileSync(distHtml, 'utf8');
 
