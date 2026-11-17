@@ -5,4 +5,9 @@ coverage/
 .DS_Store
 *.log
 .env*
-!.env.example
+
+# File nội bộ / thử nghiệm, không đẩy lên repo
+.aistudio/
+metadata.json
+MO_TIENDO.bat
+hmmm.ico

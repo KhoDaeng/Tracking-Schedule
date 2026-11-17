@@ -1,33 +1,63 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Tiến Độ Studio
 
-# Run and deploy your AI Studio app
+Ứng dụng quản lý công việc giao diện nền tối: xem theo **Danh sách** hoặc **Bảng Kanban**, tự động tính phần trăm hoàn thành từ việc con, lọc/tìm kiếm/sắp xếp, và lưu dữ liệu ngay trên trình duyệt.
 
-This contains everything you need to run your app locally.
+## Dùng ngay — không cần cài đặt
 
-View your app in AI Studio: https://ai.studio/apps/cafd5669-9c72-4608-ac77-52afd41f557b
+1. Tải **`Tiendo-Studio.html`** (hoặc `Tiendo-Studio.zip` rồi giải nén).
+2. Bấm đúp file `.html` để mở bằng Chrome / Edge / Opera.
+3. Dùng luôn — **không cần Node.js, không cần server, không cần đăng nhập, dùng được offline**.
 
-## Run Locally
+Dữ liệu tự động lưu trên trình duyệt của bạn (localStorage) sau mỗi thao tác. Đóng tab hay khởi động lại máy không mất dữ liệu.
 
-**Prerequisites:**  Node.js
+### Sao lưu / chuyển dữ liệu
 
+Trên thanh bên: **Xuất JSON** → tải file backup; **Nhập JSON** → khôi phục trên máy khác.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+> Lưu ý: bản file HTML (`file://`) và bản chạy `http://localhost:3000` là **hai kho dữ liệu riêng**. Dùng Xuất/Nhập JSON để chuyển giữa chúng. Nếu xóa site data của trình duyệt, dữ liệu cũng bị xóa.
 
-## Bản đóng gói dùng ngay (không cần cài đặt)
+## Phát triển từ mã nguồn
 
-File `Tiendo-Studio.html` (hoặc `Tiendo-Studio.zip`) là bản đã build xong: chỉ cần tải về, bấm đúp để mở trong trình duyệt là dùng được ngay, không cần Node.js hay server.
-
-Dữ liệu được lưu tự động trên trình duyệt của người dùng (localStorage). Dùng **Xuất JSON / Nhập JSON** trong Sidebar để sao lưu hoặc chuyển dữ liệu.
-
-Để tạo lại bản đóng gói sau khi sửa mã nguồn:
+Yêu cầu: **Node.js 22+** (khuyến nghị bản LTS) và npm.
 
 ```bash
 npm install
+npm run dev        # http://localhost:3000
+```
+
+| Lệnh | Mục đích |
+| --- | --- |
+| `npm run dev` | Chạy server phát triển, có hot-reload |
+| `npm run build` | Build bản production vào `dist/` |
+| `npm run build:single` | Build rồi gộp toàn bộ JS/CSS thành `Tiendo-Studio.html` |
+| `npm run preview` | Xem thử bản đã build |
+| `npm run lint` | Kiểm tra TypeScript |
+
+## Đóng gói lại file dùng ngay
+
+Sau khi sửa mã nguồn:
+
+```bash
 npm run build:single
 ```
+
+Lệnh này chạy Vite build, sau đó `scripts/build-single-file.mjs` nhét toàn bộ JavaScript và CSS vào `index.html`, tạo ra một file duy nhất có thể gửi cho người khác.
+
+## Cấu trúc chính
+
+```text
+src/
+  main.tsx              Điểm vào React
+  App.tsx               Bố cục tổng của ứng dụng
+  store/TaskContext.tsx Toàn bộ state, thao tác dữ liệu, localStorage, xuất/nhập JSON
+  components/           Sidebar, Header, ListView, KanbanView, modal, drawer, toast...
+  data/seedData.ts      Dữ liệu mẫu ban đầu
+  types/task.ts         Kiểu dữ liệu TypeScript
+  utils/progress.ts     Hàm tính tiến độ, ngày hạn, ID...
+scripts/
+  build-single-file.mjs Tạo bản đóng gói một file
+Tiendo-Studio.html      Bản dùng ngay (kết quả build)
+Tiendo-Studio.zip       Bản nén để gửi qua email
+```
+
+Công nghệ: React 19, TypeScript, Vite 8, Tailwind CSS 4, lucide-react.

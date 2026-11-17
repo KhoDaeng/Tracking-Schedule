@@ -1,6 +1,0 @@
-{
-  "name": "Tiến Độ Studio",
-  "description": "Ứng dụng quản lý tiến độ công việc phong cách Studio nền tối với Danh sách, Bảng Kanban và tự động tính phần trăm hoàn thành từ việc con.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
