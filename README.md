@@ -4,7 +4,7 @@
 
 ## Dùng ngay — không cần cài đặt
 
-1. Tải **`Tiendo-Studio.html`** (hoặc `Tiendo-Studio.zip` rồi giải nén).
+1. Tải **`release/Tiendo-Studio.html`** (hoặc `release/Tiendo-Studio.zip` rồi giải nén).
 2. Bấm đúp file `.html` để mở bằng Chrome / Edge / Opera.
 3. Dùng luôn — **không cần Node.js, không cần server, không cần đăng nhập, dùng được offline**.
 
@@ -29,7 +29,7 @@ npm run dev        # http://localhost:3000
 | --- | --- |
 | `npm run dev` | Chạy server phát triển, có hot-reload |
 | `npm run build` | Build bản production vào `dist/` |
-| `npm run build:single` | Build rồi gộp toàn bộ JS/CSS thành `Tiendo-Studio.html` |
+| `npm run build:single` | Build rồi gộp toàn bộ JS/CSS thành `release/Tiendo-Studio.html` |
 | `npm run preview` | Xem thử bản đã build |
 | `npm run lint` | Kiểm tra TypeScript |
 
@@ -41,7 +41,7 @@ Sau khi sửa mã nguồn:
 npm run build:single
 ```
 
-Lệnh này chạy Vite build, sau đó `scripts/build-single-file.mjs` nhét toàn bộ JavaScript và CSS vào `index.html`, tạo ra một file duy nhất có thể gửi cho người khác.
+Lệnh này chạy Vite build, sau đó `scripts/build-single-file.mjs` nhét toàn bộ JavaScript và CSS vào `index.html`, tạo ra một file duy nhất trong `release/` có thể gửi cho người khác. Nén file đó lại nếu cần gửi qua email.
 
 ## Cấu trúc chính
 
@@ -56,8 +56,10 @@ src/
   utils/progress.ts     Hàm tính tiến độ, ngày hạn, ID...
 scripts/
   build-single-file.mjs Tạo bản đóng gói một file
-Tiendo-Studio.html      Bản dùng ngay (kết quả build)
-Tiendo-Studio.zip       Bản nén để gửi qua email
+release/
+  Tiendo-Studio.html    Bản dùng ngay (kết quả build)
+  Tiendo-Studio.zip     Bản nén để gửi qua email
+implementation_plan.md  Bản thiết kế gốc
 ```
 
 Công nghệ: React 19, TypeScript, Vite 8, Tailwind CSS 4, lucide-react.

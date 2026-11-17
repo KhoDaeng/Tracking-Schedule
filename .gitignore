@@ -6,8 +6,6 @@ coverage/
 *.log
 .env*
 
-# File nội bộ / thử nghiệm, không đẩy lên repo
-.aistudio/
-metadata.json
-MO_TIENDO.bat
-hmmm.ico
+# File nội bộ / thử nghiệm dời vào đây, không đẩy lên repo
+_archive/
+.~lock.*#

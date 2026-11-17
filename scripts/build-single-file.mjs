@@ -4,7 +4,8 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 const distDir = path.join(root, 'dist');
 const distHtml = path.join(distDir, 'index.html');
-const output = path.join(root, 'Tiendo-Studio.html');
+const releaseDir = path.join(root, 'release');
+const output = path.join(releaseDir, 'Tiendo-Studio.html');
 
 let html = fs.readFileSync(distHtml, 'utf8');
 
@@ -38,6 +39,7 @@ html = html.replace(
   }
 );
 
+fs.mkdirSync(releaseDir, { recursive: true });
 fs.writeFileSync(output, html, 'utf8');
 const sizeKb = (Buffer.byteLength(html, 'utf8') / 1024).toFixed(1);
 console.log(`Da tao: ${output} (${sizeKb} KB)`);
