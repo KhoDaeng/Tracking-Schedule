@@ -11,15 +11,19 @@
 2. Bấm đúp file `.html` để mở bằng Chrome / Edge / Opera.
 3. Dùng luôn — **không cần Node.js, không cần server, không cần đăng nhập, dùng được offline**.
 
-Dữ liệu tự động lưu trên trình duyệt của bạn (localStorage) sau mỗi thao tác. Đóng tab hay khởi động lại máy không mất dữ liệu.
+App mở ra ở trạng thái **trống: chưa có công việc nào**. Bốn nhóm mặc định (Thiết kế & Sản phẩm, Phát triển hệ thống, Vận hành tuần, Cá nhân & Học tập) đã có sẵn để bạn chọn; bạn tự tạo công việc đầu tiên bằng nút **Thêm công việc**.
 
-> Bản phát hành `v1.0.0` vẫn giữ tên file cũ `Tiendo-Studio.*` và link tải cũ vẫn hoạt động nhờ GitHub redirect. Các bản build mới sẽ dùng tên `Tracking-Schedule.*`.
+Dữ liệu tự động lưu trên trình duyệt của bạn (localStorage, key `tracking_schedule_workspace_v1`) sau mỗi thao tác. Đóng tab hay khởi động lại máy không mất dữ liệu.
+
+> Từ `v1.0.2`, key lưu trữ đổi từ `tiendo_studio_workspace_v1` sang `tracking_schedule_workspace_v1`. Dữ liệu của các bản trước không tự động hiện. Nếu cần giữ lại, mở bản cũ → **Xuất JSON**, rồi mở bản mới → **Nhập JSON**.
+>
+> Bản file HTML (`file://`) và bản chạy `http://localhost:3000` là **hai kho dữ liệu riêng**. Dùng Xuất/Nhập JSON để chuyển giữa chúng.
 
 ### Sao lưu / chuyển dữ liệu
 
 Trên thanh bên: **Xuất JSON** → tải file backup `tracking-schedule-backup-YYYY-MM-DD.json`; **Nhập JSON** → khôi phục trên máy khác.
 
-> Lưu ý: bản file HTML (`file://`) và bản chạy `http://localhost:3000` là **hai kho dữ liệu riêng**. Dùng Xuất/Nhập JSON để chuyển giữa chúng. Nếu xóa site data của trình duyệt, dữ liệu cũng bị xóa.
+Nếu xóa site data của trình duyệt, dữ liệu cũng bị xóa.
 
 ## Phát triển từ mã nguồn
 
@@ -56,7 +60,7 @@ src/
   App.tsx               Bố cục tổng của ứng dụng
   store/TaskContext.tsx Toàn bộ state, thao tác dữ liệu, localStorage, xuất/nhập JSON
   components/           Sidebar, Header, ListView, KanbanView, modal, drawer, toast...
-  data/seedData.ts      Dữ liệu mẫu ban đầu
+  data/seedData.ts      Nhóm mặc định; danh sách công việc khởi tạo để trống
   types/task.ts         Kiểu dữ liệu TypeScript
   utils/progress.ts     Hàm tính tiến độ, ngày hạn, ID...
 scripts/
@@ -64,7 +68,7 @@ scripts/
 release/
   Tracking-Schedule.html  Bản dùng ngay (kết quả build)
   Tracking-Schedule.zip   Bản nén để gửi qua email
-implementation_plan.md  Bản thiết kế gốc (tên cũ: Tiến Độ Studio)
+implementation_plan.md  Bản thiết kế gốc
 ```
 
 Công nghệ: React 19, TypeScript, Vite 8, Tailwind CSS 4, lucide-react.

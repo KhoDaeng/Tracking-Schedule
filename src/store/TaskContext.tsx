@@ -20,7 +20,7 @@ import {
   PRIORITY_WEIGHT,
 } from '../utils/progress';
 
-const STORAGE_KEY = 'tiendo_studio_workspace_v1';
+const STORAGE_KEY = 'tracking_schedule_workspace_v1';
 
 interface PersistedWorkspace {
   version: 1;

@@ -1,4 +1,4 @@
-# Kế Hoạch Xây Dựng Ứng Dụng Quản Lý Tiến Độ Công Việc
+# Kế Hoạch Xây Dựng Ứng Dụng Tracking Schedule
 
 Ứng dụng quản lý công việc và theo dõi tiến độ theo phong cách Studio nền tối tập trung cao, kết hợp song song hai chế độ xem **Danh sách việc** và **Bảng Kanban tiến độ**, tự động tính phần trăm hoàn thành từ danh sách việc con (subtasks) và lưu trữ dữ liệu trực tiếp trên trình duyệt để sử dụng ngay lập tức.
 
